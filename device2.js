@@ -16,8 +16,7 @@ var deviceId = ConnectionString.parse(connectionString).DeviceId;
 // var client = clientFromConnectionString(connectionString);
 
 var temperature = 50;
-var humidity = 50;
-var externalTemperature = 55;
+var waterLevel = 50;
 
 function printErrorFor(op) {
     return function printError(err) {
@@ -25,12 +24,9 @@ function printErrorFor(op) {
     };
 }
 
-function generateRandomIncrement() {
-    return ((Math.random() * 2) - 1);
-}
-function generateTemperatureValues(temp) {
-  let val = (20 * Math.random()) + 50;
-  return val - 20;
+function generateRandomValues(temp) {
+  let value = (20 * Math.random()) + 40;
+  return value - 20;
 }
 
 var deviceMetaData = {
@@ -142,28 +138,18 @@ client.open(function (err,result) {
 
       // Start sending telemetry
       var sendInterval = setInterval(function () {
-          temperature = generateTemperatureValues(temperature);
-          externalTemperature += generateRandomIncrement();
-          humidity += generateRandomIncrement();
+          temperature = generateRandomValues(temperature);
+          waterLevel = generateRandomValues(waterLevel);
           // console.log('**************************', temperature);
           var data = JSON.stringify({
               'DeviceID': deviceId,
               'Temperature': temperature,
-              'Humidity': humidity,
-              'ExternalTemperature': externalTemperature
+              'WaterLevel': waterLevel
           });
 
           console.log('Sending device event data:\n' + data);
           client.sendEvent(new Message(data), printErrorFor('send event'));
       }, 5000);
-      // var data = JSON.stringify({
-      //         'DeviceID': deviceId,
-      //         'Temperature': temperature,
-      //         'Humidity': humidity,
-      //         'ExternalTemperature': externalTemperature
-      //     });
-      //   console.log('Sending device event data:\n' + data);
-      // client.sendEvent(new Message(data), printErrorFor('send event'));
 
       client.on('error', function (err) {
           printErrorFor('client')(err);
